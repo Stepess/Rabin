@@ -1,8 +1,8 @@
 package ua.asymcrypto;
 
+import ua.asymcrypto.model.Ciphertext;
 import ua.asymcrypto.model.Rabin;
 import ua.asymcrypto.model.RabinKey;
-import ua.asymcrypto.model.util.NumberUtil;
 
 import java.math.BigInteger;
 
@@ -21,7 +21,22 @@ public class App
 
         BigInteger formattedPlainText = rabin.formatePlainText(plainText);
 
-        System.out.println(formattedPlainText.toString(16));
+        System.out.println(formattedPlainText);
+
+
+        Ciphertext ciphertext = rabin.encrypt(formattedPlainText);
+        System.out.println(ciphertext);
+        System.out.println(ciphertext.getY());
+
+        System.out.println("--------");
+
+        //NumberUtil.calculateSquareRootFromBloomsNumberMod(plainText, BigInteger.valueOf(5), BigInteger.valueOf(3));
+
+
+        System.out.println(rabin.decrypt(ciphertext));
+        
+
+
 
 
     }

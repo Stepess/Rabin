@@ -1,12 +1,29 @@
 package ua.asymcrypto.model;
 
+import ua.asymcrypto.model.util.NumberUtil;
 import ua.asymcrypto.model.util.PrimeGenerator;
 import ua.asymcrypto.model.util.PrimeTests;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class Rabin {
     private RabinKey key;
+
+    public Ciphertext encrypt(BigInteger plaintext) {
+        BigInteger two = BigInteger.valueOf(2);
+        BigInteger textToEncrypt = formatePlainText(plaintext);
+
+        return new Ciphertext(
+                textToEncrypt.modPow(two, key.getN()),
+                textToEncrypt.mod(two).intValue(),
+                NumberUtil.calculateIversonSymbol(NumberUtil.calculateJacobiSymbol(textToEncrypt, key.getN())));
+    }
+
+    public BigInteger decrypt(Ciphertext ciphertext) {
+        System.out.println(Arrays.toString(NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY(), key.getP(), key.getQ())));
+        return null;
+    }
 
     public RabinKey generateKey() {
         BigInteger four = BigInteger.valueOf(4);
