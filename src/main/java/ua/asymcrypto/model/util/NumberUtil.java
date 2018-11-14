@@ -3,6 +3,10 @@ package ua.asymcrypto.model.util;
 import java.math.BigInteger;
 
 public class NumberUtil {
+    public static int calculateIversonSymbol(int num) {
+        return num == 1 ? 1 : 0;
+    }
+
     public static int calculateJacobiSymbol(BigInteger numerator, BigInteger denominator) {
         final BigInteger eight = BigInteger.valueOf(8);
         final BigInteger five = BigInteger.valueOf(5);
@@ -22,9 +26,9 @@ public class NumberUtil {
             }
         }
 
-        while (! numerator.equals(BigInteger.ZERO)) {
+        while (!numerator.equals(BigInteger.ZERO)) {
             int t = 0;
-            while (numerator.mod(two).equals(BigInteger.ZERO)){
+            while (numerator.mod(two).equals(BigInteger.ZERO)) {
                 t++;
                 numerator = numerator.divide(two);
             }
