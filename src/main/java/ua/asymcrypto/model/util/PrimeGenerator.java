@@ -1,4 +1,4 @@
-package ua.asymcrypto.util;
+package ua.asymcrypto.model.util;
 
 import java.math.BigInteger;
 import java.util.Random;
