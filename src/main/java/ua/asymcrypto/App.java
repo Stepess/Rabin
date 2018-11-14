@@ -2,6 +2,7 @@ package ua.asymcrypto;
 
 import ua.asymcrypto.model.Rabin;
 import ua.asymcrypto.model.RabinKey;
+import ua.asymcrypto.model.util.NumberUtil;
 
 import java.math.BigInteger;
 
@@ -21,5 +22,7 @@ public class App
         BigInteger formattedPlainText = rabin.formatePlainText(plainText);
 
         System.out.println(formattedPlainText.toString(16));
+
+
     }
 }
