@@ -5,6 +5,7 @@ import ua.asymcrypto.model.util.PrimeGenerator;
 import ua.asymcrypto.model.util.PrimeTests;
 
 import java.math.BigInteger;
+import java.util.Random;
 
 public class Rabin {
     private RabinKey key;
@@ -36,6 +37,30 @@ public class Rabin {
         }
 
         return result;
+    }
+
+    public SignedMessage sign(BigInteger text) {
+        BigInteger textToSign = formatePlainText(text);
+
+        if (NumberUtil.calculateJacobiSymbol(textToSign, key.getP()) != 1 ||
+        NumberUtil.calculateJacobiSymbol(textToSign, key.getQ()) != 1) {
+            return sign(text);
+        }
+
+        BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(textToSign, key.getP(), key.getQ());
+
+        Random random = new Random();
+
+        int rootIndex = random.nextInt(4);
+
+        return new SignedMessage(text, roots[rootIndex]);
+    }
+
+    //r is different each time, how will it be equals???
+
+    public boolean verify(SignedMessage message) {
+        BigInteger temp = message.getSignature().modPow(BigInteger.valueOf(2), key.getN());
+        return formatePlainText(temp).equals(message.getText());
     }
 
     public RabinKey generateKey() {
