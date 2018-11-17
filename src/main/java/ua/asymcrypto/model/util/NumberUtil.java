@@ -13,10 +13,15 @@ public class NumberUtil {
 
         BigInteger[] duv = extendedEuclid(modP, modQ);
 
-        result[0] = duv[1].multiply(modP).multiply(s1).add(duv[2].multiply(modQ).multiply(s2));
-        result[1] = duv[1].multiply(modP).multiply(s1).add(duv[2].multiply(modQ).multiply(s2).multiply(BigInteger.valueOf(-1)));
-        result[2] = duv[1].multiply(modP).multiply(s1).multiply(BigInteger.valueOf(-1)).add(duv[2].multiply(modQ).multiply(s2));
-        result[3] = duv[1].multiply(modP).multiply(s1).multiply(BigInteger.valueOf(-1)).add(duv[2].multiply(modQ).multiply(s2).multiply(BigInteger.valueOf(-1)));
+        BigInteger mod = modP.multiply(modQ);
+
+        final BigInteger addend1 = duv[1].multiply(modP).multiply(s1);
+        final BigInteger addend2 = duv[2].multiply(modQ).multiply(s2);
+
+        result[0] = addend1.add(addend2).mod(mod);
+        result[1] = addend1.add(addend2.multiply(BigInteger.valueOf(-1))).mod(mod);
+        result[2] = addend1.multiply(BigInteger.valueOf(-1)).add(addend2).mod(mod);
+        result[3] = addend1.multiply(BigInteger.valueOf(-1)).add(addend2.multiply(BigInteger.valueOf(-1))).mod(mod);
 
         return result;
     }

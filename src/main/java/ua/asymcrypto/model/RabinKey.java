@@ -39,9 +39,9 @@ public class RabinKey {
     @Override
     public String toString() {
         return "RabinKey{" + '\n' +
-                "p=" + p + '\n' +
-                "q=" + q + '\n' +
-                "n=" + n + '\n' +
+                "p=" + p.toString(16) + '\n' +
+                "q=" + q.toString(16) + '\n' +
+                "n=" + n.toString(16) + '\n' +
                 '}';
     }
 }

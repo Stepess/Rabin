@@ -5,7 +5,6 @@ import ua.asymcrypto.model.util.PrimeGenerator;
 import ua.asymcrypto.model.util.PrimeTests;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Rabin {
     private RabinKey key;
@@ -13,16 +12,30 @@ public class Rabin {
     public Ciphertext encrypt(BigInteger plaintext) {
         BigInteger two = BigInteger.valueOf(2);
         BigInteger textToEncrypt = formatePlainText(plaintext);
-
+        //BigInteger textToEncrypt = plaintext;
         return new Ciphertext(
                 textToEncrypt.modPow(two, key.getN()),
-                textToEncrypt.mod(two).intValue(),
+                getParityBit(textToEncrypt),
                 NumberUtil.calculateIversonSymbol(NumberUtil.calculateJacobiSymbol(textToEncrypt, key.getN())));
     }
 
+    private int getParityBit(BigInteger num) {
+        BigInteger two = BigInteger.valueOf(2);
+        return num.mod(two).intValue();
+    }
+
     public BigInteger decrypt(Ciphertext ciphertext) {
-        System.out.println(Arrays.toString(NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY(), key.getP(), key.getQ())));
-        return null;
+        BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY(), key.getP(), key.getQ());
+        BigInteger result = null;
+        for (BigInteger root: roots) {
+            if ((getParityBit(root) == ciphertext.getC1()) &&
+                    (NumberUtil.calculateIversonSymbol(NumberUtil.calculateJacobiSymbol(root, key.getN())) == ciphertext.getC2())) {
+                result = root;
+                break;
+            }
+        }
+
+        return result;
     }
 
     public RabinKey generateKey() {
