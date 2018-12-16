@@ -20,6 +20,16 @@ public class Rabin {
                 NumberUtil.calculateIversonSymbol(NumberUtil.calculateJacobiSymbol(textToEncrypt, key.getN())));
     }
 
+    //expanded version
+    public Ciphertext encrypt(BigInteger plaintext, BigInteger b) {
+        BigInteger two = BigInteger.valueOf(2);
+        BigInteger textToEncrypt = formatePlainText(plaintext);
+        return new Ciphertext(
+                textToEncrypt.multiply(textToEncrypt.add(b)).mod(key.getN()),
+                getParityBit(textToEncrypt.add(b.divide(two))),
+                NumberUtil.calculateJacobiSymbol(textToEncrypt.add(b.divide(two)), key.getN()));
+    }
+
     private int getParityBit(BigInteger num) {
         BigInteger two = BigInteger.valueOf(2);
         return num.mod(two).intValue();
@@ -31,6 +41,20 @@ public class Rabin {
         for (BigInteger root: roots) {
             if ((getParityBit(root) == ciphertext.getC1()) &&
                     (NumberUtil.calculateIversonSymbol(NumberUtil.calculateJacobiSymbol(root, key.getN())) == ciphertext.getC2())) {
+                result = root;
+                break;
+            }
+        }
+        return deformatePlainText(result);
+    }
+
+    //expanded version
+    public BigInteger decrypt(Ciphertext ciphertext, BigInteger b) {
+        BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY().add(b.pow(2).divide(BigInteger.valueOf(4))), key.getP(), key.getQ());
+        BigInteger result = null;
+        for (BigInteger root: roots) {
+            if ((getParityBit(root) == ciphertext.getC1()) &&
+                    ((NumberUtil.calculateJacobiSymbol(root.subtract(b.divide(BigInteger.valueOf(2))), key.getN())) == ciphertext.getC2())) {
                 result = root;
                 break;
             }

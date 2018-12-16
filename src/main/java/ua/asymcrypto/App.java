@@ -40,5 +40,14 @@ public class App
         System.out.println(rabin.verify(sign));
 
 
+        System.out.println("--------");
+        BigInteger b = new BigInteger("1358", 16);
+        System.out.println(plainText.toString(16));
+        Ciphertext encrypt = rabin.encrypt(plainText, b);
+        System.out.println(encrypt);
+
+        System.out.println(rabin.decrypt(encrypt, b).toString(16));
+
+
     }
 }
