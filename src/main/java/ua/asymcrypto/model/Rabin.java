@@ -5,7 +5,6 @@ import ua.asymcrypto.model.util.PrimeGenerator;
 import ua.asymcrypto.model.util.PrimeTests;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Rabin {
@@ -28,7 +27,6 @@ public class Rabin {
 
     public BigInteger decrypt(Ciphertext ciphertext) {
         BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY(), key.getP(), key.getQ());
-        Arrays.stream(roots).forEach(root -> System.out.println(root.toString(16)));
         BigInteger result = null;
         for (BigInteger root: roots) {
             if ((getParityBit(root) == ciphertext.getC1()) &&
@@ -37,16 +35,19 @@ public class Rabin {
                 break;
             }
         }
-
-        return result;
+        return deformatePlainText(result);
     }
 
     public SignedMessage sign(BigInteger text) {
         BigInteger textToSign = formatePlainText(text);
 
-        if (NumberUtil.calculateJacobiSymbol(textToSign, key.getP()) != 1 ||
+        /*if (NumberUtil.calculateJacobiSymbol(textToSign, key.getP()) != 1 ||
         NumberUtil.calculateJacobiSymbol(textToSign, key.getQ()) != 1) {
             return sign(text);
+        }*/
+        while (NumberUtil.calculateJacobiSymbol(textToSign, key.getP()) !=1 ||
+                NumberUtil.calculateJacobiSymbol(textToSign, key.getQ()) != 1) {
+            textToSign = formatePlainText(text);
         }
 
         BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(textToSign, key.getP(), key.getQ());
@@ -62,7 +63,9 @@ public class Rabin {
 
     public boolean verify(SignedMessage message) {
         BigInteger temp = message.getSignature().modPow(BigInteger.valueOf(2), key.getN());
-        return formatePlainText(temp).equals(message.getText());
+        System.out.println(deformatePlainText(temp).toString(16));
+        System.out.println(message.getText().toString(16));
+        return deformatePlainText(temp).equals(message.getText());
     }
 
     public RabinKey generateKey() {
@@ -87,15 +90,21 @@ public class Rabin {
         BigInteger result;
         int byteLengthOfN = getNumberLengthInBytes(key.getN());
 
-        if (getNumberLengthInBytes(text) <= (byteLengthOfN - 10)) {
+       // if (getNumberLengthInBytes(text) <= (byteLengthOfN - 10)) {
             result = two.pow((byteLengthOfN - 8)*8).multiply(BigInteger.valueOf(255))// - 2
                     .add(two.pow(64).multiply(text))
                     .add(PrimeGenerator.generateRandomPrimeIntegerWithBitLength(64));
-        } else {
-            result = text;
-        }
+       // } else {
+        //    result = text;
+       // }
 
         return result;
+    }
+
+    public BigInteger deformatePlainText(BigInteger text) {
+        BigInteger two = BigInteger.valueOf(2);
+        int byteLengthOfN = getNumberLengthInBytes(key.getN());
+        return text.mod(two.pow((byteLengthOfN - 8)*8)).divide(two.pow(64));
     }
 
     private int getNumberLengthInBytes(BigInteger number) {

@@ -3,6 +3,7 @@ package ua.asymcrypto;
 import ua.asymcrypto.model.Ciphertext;
 import ua.asymcrypto.model.Rabin;
 import ua.asymcrypto.model.RabinKey;
+import ua.asymcrypto.model.SignedMessage;
 
 import java.math.BigInteger;
 
@@ -30,16 +31,13 @@ public class App
 
         System.out.println("--------");
 
-        //NumberUtil.calculateSquareRootFromBloomsNumberMod(plainText, BigInteger.valueOf(5), BigInteger.valueOf(3));
 
 
         System.out.println(rabin.decrypt(ciphertext).toString(16));
 
-
-        //System.out.println(Arrays.toString(NumberUtil.calculateSquareRootFromBloomsNumberMod(BigInteger.valueOf(16), BigInteger.valueOf(7), BigInteger.valueOf(11))));
-
-
-
+        SignedMessage sign = rabin.sign(plainText);
+        System.out.println(sign);
+        System.out.println(rabin.verify(sign));
 
 
     }
