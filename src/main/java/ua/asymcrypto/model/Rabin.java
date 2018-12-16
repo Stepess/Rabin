@@ -26,8 +26,18 @@ public class Rabin {
         BigInteger textToEncrypt = formatePlainText(plaintext);
         return new Ciphertext(
                 textToEncrypt.multiply(textToEncrypt.add(b)).mod(key.getN()),
-                getParityBit(textToEncrypt.add(b.divide(two))),
+                getParityBit(textToEncrypt.add(b.divide(two)).mod(key.getN())),
                 NumberUtil.calculateJacobiSymbol(textToEncrypt.add(b.divide(two)), key.getN()));
+    }
+
+    //expanded version stateless
+    public Ciphertext encrypt(BigInteger plaintext, BigInteger b, BigInteger modulus) {
+        BigInteger two = BigInteger.valueOf(2);
+        BigInteger textToEncrypt = formatePlainText(plaintext, modulus);
+        return new Ciphertext(
+                textToEncrypt.multiply(textToEncrypt.add(b)).mod(modulus),
+                getParityBit(textToEncrypt.add(b.divide(two)).mod(modulus)),
+                NumberUtil.calculateJacobiSymbol(textToEncrypt.add(b.divide(two)), modulus));
     }
 
     private int getParityBit(BigInteger num) {
@@ -54,8 +64,8 @@ public class Rabin {
         BigInteger result = null;
         for (BigInteger root: roots) {
             if ((getParityBit(root) == ciphertext.getC1()) &&
-                    ((NumberUtil.calculateJacobiSymbol(root.subtract(b.divide(BigInteger.valueOf(2))), key.getN())) == ciphertext.getC2())) {
-                result = root;
+                    (NumberUtil.calculateJacobiSymbol(root, key.getN())) == ciphertext.getC2()) {
+                result = root.subtract(b.divide(BigInteger.valueOf(2)));
                 break;
             }
         }
@@ -87,9 +97,12 @@ public class Rabin {
 
     public boolean verify(SignedMessage message) {
         BigInteger temp = message.getSignature().modPow(BigInteger.valueOf(2), key.getN());
-        System.out.println(deformatePlainText(temp).toString(16));
-        System.out.println(message.getText().toString(16));
         return deformatePlainText(temp).equals(message.getText());
+    }
+
+    public boolean verify(SignedMessage message, BigInteger modulus) {
+        BigInteger temp = message.getSignature().modPow(BigInteger.valueOf(2), modulus);
+        return deformatePlainText(temp, modulus).equals(message.getText());
     }
 
     public RabinKey generateKey() {
@@ -109,6 +122,8 @@ public class Rabin {
         return key;
     }
 
+
+
     public BigInteger formatePlainText(BigInteger text) {
         BigInteger two = BigInteger.valueOf(2);
         BigInteger result;
@@ -125,10 +140,30 @@ public class Rabin {
         return result;
     }
 
+    public BigInteger formatePlainText(BigInteger text, BigInteger modulus) {
+        BigInteger two = BigInteger.valueOf(2);
+        BigInteger result;
+        int byteLengthOfN = getNumberLengthInBytes(modulus);
+        result = two.pow((byteLengthOfN - 8)*8).multiply(BigInteger.valueOf(255))// - 2
+                .add(two.pow(64).multiply(text))
+                .add(PrimeGenerator.generateRandomPrimeIntegerWithBitLength(64));
+        return result;
+    }
+
     public BigInteger deformatePlainText(BigInteger text) {
         BigInteger two = BigInteger.valueOf(2);
         int byteLengthOfN = getNumberLengthInBytes(key.getN());
-        return text.mod(two.pow((byteLengthOfN - 8)*8)).divide(two.pow(64));
+        return text
+                .mod(two.pow((byteLengthOfN - 8)*8))
+                .divide(two.pow(64));
+    }
+
+    public BigInteger deformatePlainText(BigInteger text, BigInteger modulus) {
+        BigInteger two = BigInteger.valueOf(2);
+        int byteLengthOfN = getNumberLengthInBytes(modulus);
+        return text
+                .mod(two.pow((byteLengthOfN - 8)*8))
+                .divide(two.pow(64));
     }
 
     private int getNumberLengthInBytes(BigInteger number) {
