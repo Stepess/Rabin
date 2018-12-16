@@ -16,6 +16,7 @@ public class App
         System.out.println(key);
 
         BigInteger plainText = new BigInteger("123456789ABCDEF", 16);
+        //BigInteger plainText = new BigInteger("1234F", 16);
 
         System.out.println(plainText.toString(16));
 

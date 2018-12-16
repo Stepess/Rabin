@@ -5,6 +5,7 @@ import ua.asymcrypto.model.util.PrimeGenerator;
 import ua.asymcrypto.model.util.PrimeTests;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Rabin {
@@ -27,6 +28,7 @@ public class Rabin {
 
     public BigInteger decrypt(Ciphertext ciphertext) {
         BigInteger[] roots = NumberUtil.calculateSquareRootFromBloomsNumberMod(ciphertext.getY(), key.getP(), key.getQ());
+        Arrays.stream(roots).forEach(root -> System.out.println(root.toString(16)));
         BigInteger result = null;
         for (BigInteger root: roots) {
             if ((getParityBit(root) == ciphertext.getC1()) &&
@@ -86,7 +88,7 @@ public class Rabin {
         int byteLengthOfN = getNumberLengthInBytes(key.getN());
 
         if (getNumberLengthInBytes(text) <= (byteLengthOfN - 10)) {
-            result = two.pow((byteLengthOfN - 8)*8).multiply(BigInteger.valueOf(255))
+            result = two.pow((byteLengthOfN - 8)*8).multiply(BigInteger.valueOf(255))// - 2
                     .add(two.pow(64).multiply(text))
                     .add(PrimeGenerator.generateRandomPrimeIntegerWithBitLength(64));
         } else {

@@ -8,15 +8,16 @@ public class NumberUtil {
     public static BigInteger[] calculateSquareRootFromBloomsNumberMod(BigInteger num, BigInteger modP, BigInteger modQ) {
         BigInteger[] result = new BigInteger[4];
 
-        BigInteger s1 = num.modPow(modP.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), modP);
-        BigInteger s2 = num.modPow(modQ.add(BigInteger.ONE).divide(BigInteger.valueOf(4)), modQ);
+        BigInteger s1 = num.modPow(modP.add(BigInteger.ONE).shiftRight(2), modP);
+        BigInteger s2 = num.modPow(modQ.add(BigInteger.ONE).shiftRight(2), modQ);
 
         BigInteger[] duv = extendedEuclid(modP, modQ);
 
         BigInteger mod = modP.multiply(modQ);
 
-        final BigInteger addend1 = duv[1].multiply(modP).multiply(s1);
-        final BigInteger addend2 = duv[2].multiply(modQ).multiply(s2);
+        //change s1 and s2
+        final BigInteger addend1 = duv[1].multiply(modP).multiply(s2);
+        final BigInteger addend2 = duv[2].multiply(modQ).multiply(s1);
 
         result[0] = addend1.add(addend2).mod(mod);
         result[1] = addend1.add(addend2.multiply(BigInteger.valueOf(-1))).mod(mod);
@@ -25,6 +26,7 @@ public class NumberUtil {
 
         return result;
     }
+
 
     public static BigInteger[] extendedEuclid(BigInteger p, BigInteger q) {
             if (q.equals(BigInteger.ZERO)) {
@@ -103,4 +105,7 @@ public class NumberUtil {
 
         return r;
     }
+
+
+
 }
